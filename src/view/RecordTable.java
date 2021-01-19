@@ -33,18 +33,19 @@ public class RecordTable extends JScrollPane implements TimerObserver {
 		       return false;
 		    }
 		};
+        count = 0;
 		fileManager = new CsvFileManager();
 		String fileName = getFileName(new Date());
 		List<String[]> contents = fileManager.read(fileName);
 		if(contents != null) {
 			for(String[] content : contents) {
 				model.addRow(content);
+				count++;
 			}
 		}
 		JTable table = new JTable(model);
 		setTableCellAlignment(table, JLabel.CENTER);
         this.getViewport().add(table);
-        this.count = 0;
         this.flag = false;
 	}
 

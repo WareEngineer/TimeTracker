@@ -6,6 +6,8 @@ import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Arc2D;
+import java.awt.geom.Line2D;
+import java.util.Date;
 
 import javax.swing.JPanel;
 
@@ -59,7 +61,7 @@ public class VisualTimer extends JPanel implements TimerObserver{
 		
 		for(int i=0; i<60; i++) {
 			double degree = (Math.PI/30) * i;
-			int line[];
+			double line[];
 			if(i%5==0) {
 				g2d.setStroke(new BasicStroke(2));
 				line = createIndex(centerX, centerY, r, degree, 5);
@@ -71,23 +73,28 @@ public class VisualTimer extends JPanel implements TimerObserver{
 				g2d.setStroke(new BasicStroke());
 				line = createIndex(centerX, centerY, r, degree, 2);
 			}
-			g2d.drawLine(line[0], line[1], line[2], line[3]);
+			g2d.draw(new Line2D.Double(line[0], line[1], line[2], line[3]));
 		}
 		
 		// draw remaining-time
 		if(isPositive) {
 			g2d.setColor(new Color(0xADD8E6));
+			g2d.fill(new Arc2D.Double(centerX-(d/2), centerY-(d/2), d, d, 90.0, ms/10000, Arc2D.PIE));
 		} else {
 			g2d.setColor(new Color(0xFFDAB9));
+			g2d.fill(new Arc2D.Double(centerX-(d/2), centerY-(d/2), d, d, 90.0, ms/10000, Arc2D.PIE));
 		}
-		g2d.fill(new Arc2D.Double(centerX-(d/2), centerY-(d/2), d, d, 90.0, ms/10000, Arc2D.PIE));
-		
+/*
 		// draw start-line
 		double degree = -(Math.PI/30)*(start/60000);
 		int xy[] = getXY(centerX, centerY, r, degree);
-		g2d.setStroke(new BasicStroke(2));
+		g2d.setColor(new Color(0xADD8E6));
 		g2d.drawLine(centerX, centerY, xy[0], xy[1]);
-		g2d.setStroke(new BasicStroke());
+//*/		
+		// draw bucket
+		g2d.setColor(new Color(0xADD8E6));
+		g2d.setStroke(new BasicStroke(2));
+		g2d.draw(new Arc2D.Double(centerX-(d/2), centerY-(d/2), d, d, 90.0, start/10000, Arc2D.PIE));
 	}
 	
 	private int[] optimizeStringXY(FontMetrics fm, int x, int y, String str) {
@@ -105,13 +112,13 @@ public class VisualTimer extends JPanel implements TimerObserver{
 		return rotatedXY;
 	}
 	
-	private int[] createIndex(int x, int y, int r, double degree, int len) {
-		int line[] = new int[] {x, y-r+len, x, y-r-len};
-		int rotatedLine[] = new int[4];
-		rotatedLine[0] = (int) (x + (line[0]-x)*Math.cos(degree) - (line[1]-y)*Math.sin(degree));
-		rotatedLine[1] = (int) (y + (line[0]-x)*Math.sin(degree) + (line[1]-y)*Math.cos(degree));
-		rotatedLine[2] = (int) (x + (line[2]-x)*Math.cos(degree) - (line[3]-y)*Math.sin(degree));
-		rotatedLine[3] = (int) (y + (line[2]-x)*Math.sin(degree) + (line[3]-y)*Math.cos(degree));
+	private double[] createIndex(double x, double y, int r, double degree, int len) {
+		double line[] = new double[] {x, y-r+len, x, y-r-len};
+		double rotatedLine[] = new double[4];
+		rotatedLine[0] = (x + (line[0]-x)*Math.cos(degree) - (line[1]-y)*Math.sin(degree));
+		rotatedLine[1] = (y + (line[0]-x)*Math.sin(degree) + (line[1]-y)*Math.cos(degree));
+		rotatedLine[2] = (x + (line[2]-x)*Math.cos(degree) - (line[3]-y)*Math.sin(degree));
+		rotatedLine[3] = (y + (line[2]-x)*Math.sin(degree) + (line[3]-y)*Math.cos(degree));
 		return rotatedLine;
 	}
 }
